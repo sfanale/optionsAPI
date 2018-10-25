@@ -1,0 +1,40 @@
+swagger: "2.0"
+info:
+  description: This is the swagger file that goes with our server code
+  version: "1.0.0"
+  title: Swagger ReST Article
+consumes:
+  - application/json
+produces:
+  - application/json
+
+basePath: /api
+
+# Paths supported by the server application
+paths:
+  /options/{ticker}:
+      get:
+        operationId: get_option_prices.read_one
+        tags:
+          - options
+        summary: Get all options data for one asset
+        description: Get all options data for one asset
+        parameters:
+          - name: ticker
+            in: path
+            description: Stock ticker symbol for asset
+            type: string
+            required: True
+        responses:
+          200:
+            description: Successfully found option in database
+            schema:
+              properties:
+                symbol:
+                  type: string
+                expiry:
+                  type: integer
+                lastprice:
+                  type: float
+                timestamp:
+                  type: string
