@@ -14,7 +14,7 @@ basePath: /api
 paths:
   /options/{ticker}:
       get:
-        operationId: get_option_prices.read_one
+        operationId: get_options_prices.read_one
         tags:
           - options
         summary: Get all options data for one asset
@@ -27,14 +27,22 @@ paths:
             required: True
         responses:
           200:
-            description: Successfully found option in database
+            description: Successfully found stock
             schema:
-              properties:
-                symbol:
-                  type: string
-                expiry:
-                  type: integer
-                lastprice:
-                  type: float
-                timestamp:
-                  type: string
+              type: array
+              items:
+                properties:
+                  symbol:
+                    type: string
+                  expiry:
+                    type: string
+                  strike:
+                    type: string
+                  lastprice:
+                    type: string
+                  pricedate:
+                    type: string
+                  timestamp:
+                    type: string
+
+  

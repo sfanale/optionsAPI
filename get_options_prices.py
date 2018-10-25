@@ -5,6 +5,7 @@ import psycopg2
 from flask import make_response, abort
 
 
+
 def connect_to_db():
     conn = psycopg2.connect(host="localhost", database="options_prices", user="postgres", password="mypassword")
     cur = conn.cursor()
@@ -24,11 +25,16 @@ def read_one(ticker):
     """
     # Does the person exist in people?
     cur, conn = connect_to_db()
-
+    resultDict = []
     try:
-        cur.execute("""SELECT DISTINCT * FROM prices WHERE underlyingsymbol IS (%()s) """, ticker)
+        cur.execute("""SELECT pricedate, expiration, strike, lastprice FROM prices WHERE underlyingsymbol = 'AAPL';""")
         result = cur.fetchall()
         print(result)
+        print(len(result))
+        print(cur.rowcount)
+        for row in result:
+            resultDict.append({'symbol': ticker, 'expiry': row[1], 'strike': row[2], 'lastprice': row[3],
+                               'pricedate': row[0], 'timestamp': get_timestamp()})
     # otherwise, nope, not found
     except ValueError:
         abort(
@@ -36,5 +42,7 @@ def read_one(ticker):
         )
     cur.close()
     conn.close()
-    return result
+    print(resultDict)
+    print(len(resultDict))
+    return resultDict
 
