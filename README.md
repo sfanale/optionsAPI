@@ -7,4 +7,5 @@
 
 ## Available Calls
 1. api/options/{ticker}
+
   This api call accepts a ticker or stock symbol, and returns all information in the database associated with this symbol.
