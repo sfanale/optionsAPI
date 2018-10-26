@@ -28,7 +28,7 @@ def read_one(ticker):
     cur, conn = connect_to_db()
     resultDict = []
     try:
-        cur.execute("""SELECT pricedate, expiration, strike, lastprice FROM prices WHERE underlyingsymbol = 'AAPL';""")
+        cur.execute("""SELECT pricedate, expiration, strike, lastprice FROM prices WHERE underlyingsymbol = %s;""", (ticker,))
         result = cur.fetchall()
         print(result)
         print(len(result))
