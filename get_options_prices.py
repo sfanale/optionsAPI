@@ -1,9 +1,10 @@
 from datetime import datetime
 import psycopg2
+import flask
+
 
 # 3rd party modules
 from flask import make_response, abort
-
 
 
 def connect_to_db():
@@ -44,5 +45,7 @@ def read_one(ticker):
     conn.close()
     print(resultDict)
     print(len(resultDict))
-    return resultDict
+    return flask.jsonify(resultDict)
+    #print(flask.jsonify(resultDict[0:3]))
+    #return resultDict[0:3]
 

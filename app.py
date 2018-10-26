@@ -1,11 +1,16 @@
 from flask import (Flask, render_template)
 import connexion
 
+from flask_cors import CORS
+
 # create application instance
 app = connexion.App(__name__, specification_dir="./")
 
 # read swagger.yml to configure endpoints
 app.add_api('swagger.yml')
+
+# add CORS support
+CORS(app.app)
 
 
 @app.route('/')
