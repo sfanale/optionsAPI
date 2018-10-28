@@ -17,6 +17,33 @@ paths:
         operationId: get_options_prices.read_list
         tags:
           - options
+        summary: Get list of contracts for one stock
+        description: Get all contracts for one stock
+        parameters:
+          - name: ticker
+            in: path
+            description: Stock ticker symbol for asset
+            type: string
+            required: True
+        responses:
+          200:
+            description: Successfully found stock
+            schema:
+              type: array
+              items:
+                properties:
+                  symbol:
+                    type: string
+                  contractsymbol:
+                    type: string
+                  timestamp:
+                    type: string
+
+  /options/all/{ticker}:
+      get:
+        operationId: get_options_prices.read_one_all
+        tags:
+          - options
         summary: Get all options data for one asset
         description: Get all options data for one asset
         parameters:
@@ -44,3 +71,4 @@ paths:
                     type: string
                   timestamp:
                     type: string
+
