@@ -14,7 +14,7 @@ basePath: /api
 paths:
   /options/{ticker}:
       get:
-        operationId: get_options_prices.read_one
+        operationId: get_options_prices.read_list
         tags:
           - options
         summary: Get all options data for one asset
