@@ -67,6 +67,8 @@ paths:
                     type: string
                   pricedate:
                     type: string
+                  symbol:
+                    type: string
                   timestamp:
                     type: string
 

@@ -8,7 +8,8 @@ from flask import make_response, abort
 
 
 def connect_to_db():
-    conn = psycopg2.connect(host="localhost", database="options_prices", user="postgres", password="mypassword")
+    conn = psycopg2.connect(host="options-prices.cetjnpk7rvcs.us-east-1.rds.amazonaws.com", database="options_prices",
+                            user="Stephen", password="password69")
     cur = conn.cursor()
     return cur, conn
 
@@ -93,7 +94,7 @@ def read_one_symbol(contractsymbol):
     cur, conn = connect_to_db()
     resultDict = []
     try:
-        cur.execute("""SELECT pricedate, expiration, strike, lastprice FROM prices WHERE contractsymbol = %s;""",
+        cur.execute("""SELECT pricedate, expiration, strike, lastprice, underlyingsymbol FROM prices WHERE contractsymbol = %s ORDER BY pricedate;""",
                     (contractsymbol.upper(),))
         result = cur.fetchall()
         print(result)
@@ -101,7 +102,7 @@ def read_one_symbol(contractsymbol):
         print(cur.rowcount)
         for row in result:
             resultDict.append({'expiry': row[1], 'strike': row[2], 'lastprice': row[3],
-                               'pricedate': row[0], 'timestamp': get_timestamp()})
+                               'pricedate': row[0], 'symbol': row[4], 'timestamp': get_timestamp()})
     # otherwise, nope, not found
     except ValueError:
         abort(
