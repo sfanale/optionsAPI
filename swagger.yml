@@ -39,6 +39,38 @@ paths:
                   timestamp:
                     type: string
 
+  /options/detail/{contractsymbol}:
+      get:
+        operationId: get_options_prices.read_one_symbol
+        tags:
+          - options
+        summary: Get all information about a single contract
+        description: Get all option data for one contract
+        parameters:
+          - name: contractsymbol
+            in: path
+            description: Contract Symbole for option
+            type: string
+            required: True
+        responses:
+          200:
+            description: Successfully found contract details
+            schema:
+              type: array
+              items:
+                properties:
+                  expiry:
+                    type: string
+                  strike:
+                    type: string
+                  lastprice:
+                    type: string
+                  pricedate:
+                    type: string
+                  timestamp:
+                    type: string
+
+
   /options/all/{ticker}:
       get:
         operationId: get_options_prices.read_one_all
