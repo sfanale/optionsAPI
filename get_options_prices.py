@@ -94,7 +94,7 @@ def read_one_symbol(contractsymbol):
     cur, conn = connect_to_db()
     resultDict = []
     try:
-        cur.execute("""SELECT pricedate, expiration, strike, lastprice, underlyingsymbol FROM prices WHERE contractsymbol = %s ORDER BY pricedate;""",
+        cur.execute("""SELECT pricedate, expiration, strike, lastprice, underlyingsymbol, optiontype FROM prices WHERE contractsymbol = %s ORDER BY pricedate;""",
                     (contractsymbol.upper(),))
         result = cur.fetchall()
         print(result)
@@ -102,7 +102,7 @@ def read_one_symbol(contractsymbol):
         print(cur.rowcount)
         for row in result:
             resultDict.append({'expiry': row[1], 'strike': row[2], 'lastprice': row[3],
-                               'pricedate': row[0], 'symbol': row[4], 'timestamp': get_timestamp()})
+                               'pricedate': row[0], 'symbol': row[4], 'timestamp': get_timestamp(), 'optiontype': row[5]})
     # otherwise, nope, not found
     except ValueError:
         abort(
