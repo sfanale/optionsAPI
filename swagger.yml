@@ -95,6 +95,8 @@ paths:
                 properties:
                   symbol:
                     type: string
+                  contractsymbol:
+                    type: string
                   expiry:
                     type: string
                   strike:

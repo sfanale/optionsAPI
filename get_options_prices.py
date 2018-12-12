@@ -61,13 +61,13 @@ def read_one_all(ticker):
     cur, conn = connect_to_db()
     resultDict = []
     try:
-        cur.execute("""SELECT pricedate, expiration, strike, lastprice FROM prices WHERE underlyingsymbol = %s;""", (ticker.upper(),))
+        cur.execute("""SELECT pricedate, contractsymbol, expiration, strike, lastprice FROM prices WHERE underlyingsymbol = %s;""", (ticker.upper(),))
         result = cur.fetchall()
         print(result)
         print(len(result))
         print(cur.rowcount)
         for row in result:
-            resultDict.append({'symbol': ticker, 'expiry': row[1], 'strike': row[2], 'lastprice': row[3],
+            resultDict.append({'symbol': ticker, 'contractsymbol':row[1],'expiry': row[2], 'strike': row[3], 'lastprice': row[4],
                                'pricedate': row[0], 'timestamp': get_timestamp()})
     # otherwise, nope, not found
     except ValueError:
