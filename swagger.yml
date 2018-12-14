@@ -105,6 +105,12 @@ paths:
                     type: string
                   pricedate:
                     type: string
+                  optiontype:
+                    type: string
+                  bid:
+                    type: string
+                  ask:
+                    type: string
                   timestamp:
                     type: string
 
