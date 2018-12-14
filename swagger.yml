@@ -79,7 +79,7 @@ paths:
         tags:
           - options
         summary: Get all options data for one asset
-        description: Get all options data for one asset
+        description: Get all options data for one asset. dates are in unix time.
         parameters:
           - name: ticker
             in: path
@@ -114,3 +114,33 @@ paths:
                   timestamp:
                     type: string
 
+  /quotes/{ticker}:
+      get:
+        operationId: get_stock_prices.read_list
+        tags:
+          - stocks
+        summary: Get price data for one stock/etf
+        description: Get all prices for one stock/etf
+        parameters:
+          - name: ticker
+            in: path
+            description: Stock ticker symbol for asset
+            type: string
+            required: True
+        responses:
+          200:
+            description: Successfully found stock
+            schema:
+              type: array
+              items:
+                properties:
+                  symbol:
+                    type: string
+                  pricedate:
+                    type: string
+                  regulardate:
+                    type: string
+                  closeprice:
+                    type: string
+                  timestamp:
+                    type: string
