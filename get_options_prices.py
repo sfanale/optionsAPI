@@ -1,5 +1,6 @@
 from datetime import datetime
 import psycopg2
+
 import flask
 
 
@@ -61,15 +62,19 @@ def read_one_all(ticker):
     cur, conn = connect_to_db()
     resultDict = []
     try:
-        cur.execute("""SELECT pricedate, contractsymbol, expiration, strike, lastprice, optiontype, bid, ask FROM prices WHERE underlyingsymbol = %s;""", (ticker.upper(),))
+        if ticker == "*":
+            cur.execute("""SELECT pricedate, contractsymbol, expiration, strike, lastprice, optiontype,
+          bid, ask, openinterest, volume FROM prices """,)
+        else:
+            cur.execute("""SELECT pricedate, contractsymbol, expiration, strike, lastprice, optiontype,
+          bid, ask, openinterest, volume FROM prices WHERE underlyingsymbol = %s;""", (ticker.upper(),))
         result = cur.fetchall()
-        print(result)
         print(len(result))
-        print(cur.rowcount)
 
         for row in result:
-            resultDict.append({'symbol': ticker, 'contractsymbol':row[1],'expiry': row[2], 'strike': row[3], 'lastprice': row[4],
-                               'pricedate': row[0], 'optiontype':row[5], 'bid':row[6], 'ask' :row[7], 'timestamp': get_timestamp()})
+            resultDict.append({'symbol': ticker, 'contractsymbol':row[1],'expiry': row[2], 'strike': row[3],
+                               'lastprice': row[4], 'pricedate': row[0], 'optiontype':row[5], 'bid':row[6],
+                               'ask' :row[7], 'openinterest':row[8], 'volume':row[9], 'timestamp': get_timestamp()})
     # otherwise, nope, not found
     except ValueError:
         abort(
@@ -77,11 +82,7 @@ def read_one_all(ticker):
         )
     cur.close()
     conn.close()
-    print(resultDict)
-    print(len(resultDict))
     return flask.jsonify(resultDict)
-    #print(flask.jsonify(resultDict[0:3]))
-    #return resultDict[0:3]
 
 
 def read_one_symbol(contractsymbol):
