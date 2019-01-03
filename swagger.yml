@@ -79,7 +79,7 @@ paths:
         tags:
           - options
         summary: Get all options data for one asset
-        description: Get all options data for one asset. dates are in unix time.
+        description: Get all options data for one asset. dates are in NY local unix time,.
         parameters:
           - name: ticker
             in: path
@@ -110,6 +110,10 @@ paths:
                   bid:
                     type: string
                   ask:
+                    type: string
+                  openinterest:
+                    type: string
+                  volume:
                     type: string
                   timestamp:
                     type: string
