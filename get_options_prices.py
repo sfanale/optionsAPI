@@ -30,13 +30,13 @@ def read_list(ticker):
     cur, conn = connect_to_db()
     resultDict = []
     try:
-        cur.execute("""SELECT DISTINCT contractsymbol FROM prices WHERE underlyingsymbol = %s ORDER BY contractsymbol;""", (ticker.upper(),))
+        cur.execute("""SELECT DISTINCT contractsymbol, expiration, strike FROM prices WHERE underlyingsymbol = %s ORDER BY expiration;""", (ticker.upper(),))
         result = cur.fetchall()
         print(result)
         print(len(result))
         print(cur.rowcount)
         for row in result:
-            resultDict.append({'symbol': ticker, 'contractsymbol':row[0]})
+            resultDict.append({'symbol': ticker, 'contractsymbol':row[0], 'expiry': row[1], 'strike': row[2]})
     # otherwise, nope, not found
     except ValueError:
         abort(
@@ -53,14 +53,16 @@ def read_list(ticker):
 
 def read_one_all(ticker):
     """
-    This function responds to a request for /api/options/{ticker}
+    This function responds to a request for /api/options/all{ticker}
     with  matching assset from options database
     :param ticker:   symbol of asset to find
     :return:        assets matching symbol
     """
     # Does the person exist in people?
+    print(get_timestamp())
     cur, conn = connect_to_db()
     resultDict = []
+    print(get_timestamp())
     try:
         if ticker == "*":
             cur.execute("""SELECT pricedate, contractsymbol, expiration, strike, lastprice, optiontype,
@@ -68,7 +70,9 @@ def read_one_all(ticker):
         else:
             cur.execute("""SELECT pricedate, contractsymbol, expiration, strike, lastprice, optiontype,
           bid, ask, openinterest, volume FROM prices WHERE underlyingsymbol = %s;""", (ticker.upper(),))
+        print(get_timestamp())
         result = cur.fetchall()
+        print(get_timestamp())
         print(len(result))
 
         for row in result:
@@ -76,6 +80,7 @@ def read_one_all(ticker):
                                'lastprice': row[4], 'pricedate': row[0], 'optiontype':row[5], 'bid':row[6],
                                'ask' :row[7], 'openinterest':row[8], 'volume':row[9], 'timestamp': get_timestamp()})
     # otherwise, nope, not found
+        print(get_timestamp())
     except ValueError:
         abort(
             404, "asset with name {ticker} not found".format(ticker=ticker)
@@ -96,7 +101,8 @@ def read_one_symbol(contractsymbol):
     cur, conn = connect_to_db()
     resultDict = []
     try:
-        cur.execute("""SELECT pricedate, expiration, strike, lastprice, underlyingsymbol, optiontype FROM prices WHERE contractsymbol = %s ORDER BY pricedate;""",
+        cur.execute("""SELECT pricedate, expiration, strike, lastprice, underlyingsymbol, optiontype, bid, ask,
+          openinterest, volume FROM prices WHERE contractsymbol = %s ORDER BY pricedate;""",
                     (contractsymbol.upper(),))
         result = cur.fetchall()
         print(result)
@@ -104,7 +110,9 @@ def read_one_symbol(contractsymbol):
         print(cur.rowcount)
         for row in result:
             resultDict.append({'expiry': row[1], 'strike': row[2], 'lastprice': row[3],
-                               'pricedate': row[0], 'symbol': row[4], 'timestamp': get_timestamp(), 'optiontype': row[5]})
+                               'pricedate': row[0], 'symbol': row[4],  'bid': row[6],
+                               'ask':row[7], 'openinterest': row[8], 'volume': row[9],
+                               'timestamp': get_timestamp(), 'optiontype': row[5]})
     # otherwise, nope, not found
     except ValueError:
         abort(

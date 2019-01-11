@@ -1,8 +1,10 @@
 swagger: "2.0"
 info:
-  description: This is the swagger file that goes with our server code
+  description: This is the swagger file that describes the functionality of this api. To make a request, remove /ui and
+   add the relevant path. Supported tickers are most of the S&P 500, DB, IVV, IJR, IYE, IYF, IYJ, IYK, IYM, IYZ, and IYW.
+   Enjoy! Feel free to contact me with questions.
   version: "1.0.0"
-  title: Swagger ReST Article
+  title: Fanale Research Option Data Api
 consumes:
   - application/json
 produces:
