@@ -29,8 +29,26 @@ def read_list(ticker):
     # Does the person exist in people?
     cur, conn = connect_to_db()
     resultDict = []
+    values = ticker.split('&')
+    print(values)
     try:
-        cur.execute("""SELECT DISTINCT contractsymbol, expiration, strike FROM prices WHERE underlyingsymbol = %s ORDER BY expiration;""", (ticker.upper(),))
+        if values[1] == '' and values[2] == '':
+            cur.execute(
+                """SELECT DISTINCT contractsymbol, expiration, strike FROM prices WHERE underlyingsymbol = %s ORDER BY expiration;""",
+                (values[0].upper(),))
+        elif values[1] == '':
+            cur.execute(
+                """SELECT DISTINCT contractsymbol, expiration, strike FROM prices WHERE underlyingsymbol = %s  AND expiration > %s ORDER BY expiration;""",
+                (values[0].upper(), values[2]))
+        elif values [2] == '':
+            cur.execute(
+                """SELECT DISTINCT contractsymbol, expiration, strike FROM prices WHERE underlyingsymbol = %s AND strike = %s ORDER BY expiration;""",
+                (values[0].upper(), values[1],))
+        else:
+            cur.execute(
+                """SELECT DISTINCT contractsymbol, expiration, strike FROM prices WHERE underlyingsymbol = %s AND strike = %s AND expiration> %s ORDER BY expiration;""",
+                (values[0].upper(), values[1], values[2]))
+
         result = cur.fetchall()
         print(result)
         print(len(result))
