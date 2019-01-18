@@ -19,7 +19,8 @@ paths:
         operationId: get_options_prices.read_list
         tags:
           - options
-        summary: Get list of contracts for one stock
+        summary: Get list of options contracts for one stock symbol. Can specify by minimum expiration date or strike price
+        as well. e.q. 'AAPL&200&1577836800'. Date or strike or both can be empty but ticker must be specified.
         description: Get all contracts for one stock
         parameters:
           - name: ticker
@@ -69,6 +70,16 @@ paths:
                     type: string
                   pricedate:
                     type: string
+                  optiontype:
+                    type: string
+                  bid:
+                    type: string
+                  ask:
+                    type: string
+                  openinterest:
+                    type: string
+                  volume:
+                    type: string
                   symbol:
                     type: string
                   timestamp:
@@ -80,7 +91,7 @@ paths:
         operationId: get_options_prices.read_one_all
         tags:
           - options
-        summary: Get all options data for one asset
+        summary: Get all options data for all contracts for one asset
         description: Get all options data for one asset. dates are in NY local unix time,.
         parameters:
           - name: ticker
@@ -144,9 +155,9 @@ paths:
                     type: string
                   pricedate:
                     type: string
-                  regulardate:
-                    type: string
                   closeprice:
+                    type: string
+                  volume:
                     type: string
                   timestamp:
                     type: string
