@@ -142,3 +142,27 @@ def read_one_symbol(contractsymbol):
     print(len(resultDict))
     return flask.jsonify(resultDict)
 
+def getAllTickers():
+    """
+        This function responds to a request for /api/options/getAllTickers
+        with all tickers that have options
+        :param
+        :return:  all tickers
+        """
+    # Does the person exist in people?
+    cur, conn = connect_to_db()
+    resultDict = []
+    try:
+        cur.execute("""SELECT DISTINCT underlyingsymbol FROM prices;""")
+        result = cur.fetchall()
+        for row in result:
+            resultDict.append(row[0])
+    # otherwise, nope, not found
+    except ValueError:
+        abort(
+            404, "not found"
+        )
+    cur.close()
+    conn.close()
+    print(resultDict)
+    return flask.jsonify(resultDict)

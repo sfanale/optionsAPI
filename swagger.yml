@@ -2,7 +2,8 @@ swagger: "2.0"
 info:
   description: This is the swagger file that describes the functionality of this api. To make a request, remove /ui and
    add the relevant path. Supported tickers are most of the S&P 500, DB, IVV, IJR, IYE, IYF, IYJ, IYK, IYM, IYZ, and IYW.
-   Enjoy! Feel free to contact me with questions.
+   Enjoy! Feel free to contact me with questions. If you use this data frequently, please considering donating to https://paypal.me/StephenFanale?locale.x=en_US
+   so I can keep paying AWS to host this data.
   version: "1.0.0"
   title: Fanale Research Option Data Api
 consumes:
@@ -20,7 +21,7 @@ paths:
         tags:
           - options
         summary: Get list of options contracts for one stock symbol. Can specify by minimum expiration date or strike price
-        as well. e.q. 'AAPL&200&1577836800'. Date or strike or both can be empty but ticker must be specified.
+          as well. e.q. 'AAPL&200&1577836800'. Date or strike or both can be empty but ticker must be specified.
         description: Get all contracts for one stock
         parameters:
           - name: ticker
@@ -160,4 +161,21 @@ paths:
                   volume:
                     type: string
                   timestamp:
+                    type: string
+
+  /options/getAllTickers:
+      get:
+        operationId: get_options_prices.getAllTickers
+        tags:
+          - options
+        summary: Get list of all symbols with options data
+        description: Get all symbols with options data
+        responses:
+          200:
+            description: Successfull
+            schema:
+              type: array
+              items:
+                properties:
+                  symbol:
                     type: string
