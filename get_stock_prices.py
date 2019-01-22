@@ -32,9 +32,6 @@ def read_list(ticker):
         cur.execute("""SELECT pricedate, regularmarketvolume, regularmarketprice  FROM qoutes WHERE symbol = %s ORDER BY pricedate;""",
                     (ticker.upper(),))
         result = cur.fetchall()
-        print(result)
-        print(len(result))
-        print(cur.rowcount)
         for row in result:
             resultDict.append({'symbol': ticker, 'pricedate': row[0], 'volume': row[1], 'close': row[2],
                                'timestamp': get_timestamp()})
@@ -45,9 +42,4 @@ def read_list(ticker):
         )
     cur.close()
     conn.close()
-    print(resultDict)
-    print(len(resultDict))
     return flask.jsonify(resultDict)
-    #print(flask.jsonify(resultDict[0:3]))
-    #return resultDict[0:3]
-

@@ -30,7 +30,6 @@ def read_list(ticker):
     cur, conn = connect_to_db()
     resultDict = []
     values = ticker.split('&')
-    print(values)
     try:
         if values[1] == '' and values[2] == '':
             cur.execute(
@@ -50,9 +49,6 @@ def read_list(ticker):
                 (values[0].upper(), values[1], values[2]))
 
         result = cur.fetchall()
-        print(result)
-        print(len(result))
-        print(cur.rowcount)
         for row in result:
             resultDict.append({'symbol': ticker, 'contractsymbol':row[0], 'expiry': row[1], 'strike': row[2]})
     # otherwise, nope, not found
@@ -62,11 +58,8 @@ def read_list(ticker):
         )
     cur.close()
     conn.close()
-    print(resultDict)
-    print(len(resultDict))
+
     return flask.jsonify(resultDict)
-    #print(flask.jsonify(resultDict[0:3]))
-    #return resultDict[0:3]
 
 
 def read_one_all(ticker):
@@ -84,21 +77,15 @@ def read_one_all(ticker):
     try:
         if ticker == "*":
             cur.execute("""SELECT pricedate, contractsymbol, expiration, strike, lastprice, optiontype,
-          bid, ask, openinterest, volume FROM prices """,)
+          bid, ask, openinterest, volume, industry, sector FROM prices """,)
         else:
             cur.execute("""SELECT pricedate, contractsymbol, expiration, strike, lastprice, optiontype,
-          bid, ask, openinterest, volume FROM prices WHERE underlyingsymbol = %s;""", (ticker.upper(),))
-        print(get_timestamp())
+          bid, ask, openinterest, volume, industry, sector FROM prices WHERE underlyingsymbol = %s;""", (ticker.upper(),))
         result = cur.fetchall()
-        print(get_timestamp())
-        print(len(result))
-
         for row in result:
             resultDict.append({'symbol': ticker, 'contractsymbol':row[1],'expiry': row[2], 'strike': row[3],
                                'lastprice': row[4], 'pricedate': row[0], 'optiontype':row[5], 'bid':row[6],
-                               'ask' :row[7], 'openinterest':row[8], 'volume':row[9], 'timestamp': get_timestamp()})
-    # otherwise, nope, not found
-        print(get_timestamp())
+                               'ask' :row[7], 'openinterest':row[8], 'volume':row[9], 'industry':row[10], 'sector':row[11], 'timestamp': get_timestamp()})
     except ValueError:
         abort(
             404, "asset with name {ticker} not found".format(ticker=ticker)
@@ -120,16 +107,14 @@ def read_one_symbol(contractsymbol):
     resultDict = []
     try:
         cur.execute("""SELECT pricedate, expiration, strike, lastprice, underlyingsymbol, optiontype, bid, ask,
-          openinterest, volume FROM prices WHERE contractsymbol = %s ORDER BY pricedate;""",
+          openinterest, volume, industry, sector FROM prices WHERE contractsymbol = %s ORDER BY pricedate;""",
                     (contractsymbol.upper(),))
         result = cur.fetchall()
-        print(result)
-        print(len(result))
-        print(cur.rowcount)
         for row in result:
             resultDict.append({'expiry': row[1], 'strike': row[2], 'lastprice': row[3],
                                'pricedate': row[0], 'symbol': row[4],  'bid': row[6],
                                'ask':row[7], 'openinterest': row[8], 'volume': row[9],
+                               'industry': row[10], 'sectr': row[11],
                                'timestamp': get_timestamp(), 'optiontype': row[5]})
     # otherwise, nope, not found
     except ValueError:
@@ -138,8 +123,6 @@ def read_one_symbol(contractsymbol):
         )
     cur.close()
     conn.close()
-    print(resultDict)
-    print(len(resultDict))
     return flask.jsonify(resultDict)
 
 def getAllTickers():
@@ -164,5 +147,4 @@ def getAllTickers():
         )
     cur.close()
     conn.close()
-    print(resultDict)
     return flask.jsonify(resultDict)

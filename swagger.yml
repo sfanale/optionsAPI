@@ -83,6 +83,10 @@ paths:
                     type: string
                   symbol:
                     type: string
+                  sector:
+                    type: string
+                  industry:
+                    type: string
                   timestamp:
                     type: string
 
@@ -129,6 +133,10 @@ paths:
                     type: string
                   volume:
                     type: string
+                  sector:
+                    type: string
+                  industry:
+                    type: string
                   timestamp:
                     type: string
 
@@ -162,6 +170,7 @@ paths:
                     type: string
                   timestamp:
                     type: string
+
 
   /options/getAllTickers:
       get:
