@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   description: This is the swagger file that describes the functionality of this api. To make a request, remove /ui and
-   add the relevant path. Supported tickers are most of the S&P 500, DB, IVV, IJR, IYE, IYF, IYJ, IYK, IYM, IYZ, and IYW.
+   add the relevant path. Supported tickers can be found from /options/getAllTickers. I have recently added many more symbols.
    Enjoy! Feel free to contact me with questions. If you use this data frequently, please considering donating to https://paypal.me/StephenFanale?locale.x=en_US
    so I can keep paying AWS to host this data.
   version: "1.0.0"
@@ -156,7 +156,7 @@ paths:
                     type: string
                   pricedate:
                     type: string
-                  closeprice:
+                  closep:
                     type: string
                   volume:
                     type: string
