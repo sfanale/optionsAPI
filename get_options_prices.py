@@ -136,7 +136,14 @@ def getAllTickers():
     cur, conn = connect_to_db()
     resultDict = []
     try:
-        cur.execute("""SELECT DISTINCT underlyingsymbol FROM prices;""")
+        cur.execute("""WITH RECURSIVE t AS (
+   (SELECT underlyingsymbol FROM prices ORDER BY underlyingsymbol LIMIT 1)  -- parentheses required
+   UNION ALL
+   SELECT (SELECT underlyingsymbol FROM prices WHERE underlyingsymbol > t.underlyingsymbol ORDER BY underlyingsymbol LIMIT 1)
+   FROM t
+   WHERE t.underlyingsymbol IS NOT NULL
+   )
+SELECT underlyingsymbol FROM t WHERE underlyingsymbol IS NOT NULL;""")
         result = cur.fetchall()
         for row in result:
             resultDict.append(row[0])
