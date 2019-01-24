@@ -1,6 +1,6 @@
 from datetime import datetime
 import psycopg2
-
+import pandas as pd
 import flask
 
 
@@ -74,6 +74,7 @@ def read_one_all(ticker):
     cur, conn = connect_to_db()
     resultDict = []
     print(get_timestamp())
+
     try:
         if ticker == "*":
             cur.execute("""SELECT pricedate, contractsymbol, expiration, strike, lastprice, optiontype,
