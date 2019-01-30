@@ -1,6 +1,5 @@
 from datetime import datetime
 import psycopg2
-import pandas as pd
 import flask
 
 
@@ -156,3 +155,35 @@ SELECT underlyingsymbol FROM t WHERE underlyingsymbol IS NOT NULL;""")
     cur.close()
     conn.close()
     return flask.jsonify(resultDict)
+
+def getAllContracts():
+    """
+        This function responds to a request for /api/options/getAllTickers
+        with all tickers that have options
+        :param
+        :return:  all tickers
+        """
+    # Does the person exist in people?
+    cur, conn = connect_to_db()
+    resultDict = []
+    try:
+        cur.execute("""WITH RECURSIVE t AS (
+   (SELECT contractsymbol FROM prices ORDER BY contractsymbol LIMIT 1)  -- parentheses required
+   UNION ALL
+   SELECT (SELECT contractsymbol FROM prices WHERE contractsymbol > t.contractsymbol ORDER BY contractsymbol LIMIT 1)
+   FROM t
+   WHERE t.contractsymbol IS NOT NULL
+   )
+SELECT contractsymbol FROM t WHERE contractsymbol IS NOT NULL;""")
+        result = cur.fetchall()
+        for row in result:
+            resultDict.append(row[0])
+    # otherwise, nope, not found
+    except ValueError:
+        abort(
+            404, "not found"
+        )
+    cur.close()
+    conn.close()
+    return flask.jsonify(resultDict)
+

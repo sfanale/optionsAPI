@@ -188,3 +188,20 @@ paths:
                 properties:
                   symbol:
                     type: string
+
+  /options/getAllContracts:
+    get:
+      operationId: get_options_prices.getAllContracts
+      tags:
+        - options
+      summary: Get list of all contracts with options data
+      description: Get all contracts with options data
+      responses:
+        200:
+          description: Successfull
+          schema:
+            type: array
+            items:
+              properties:
+                symbol:
+                  type: string
