@@ -1,7 +1,7 @@
 from datetime import datetime
 import psycopg2
 import flask
-
+import numpy as np
 
 # 3rd party modules
 from flask import make_response, abort

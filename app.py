@@ -1,6 +1,5 @@
 from flask import (Flask, render_template)
 import connexion
-
 from flask_cors import CORS
 
 # create application instance
@@ -22,6 +21,7 @@ def home():
             :return:        the rendered template 'home.html'
             """
     return render_template("home.html")
+
 
 
 # if we are running in stand alone mode, run the application

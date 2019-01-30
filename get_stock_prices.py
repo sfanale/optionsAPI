@@ -47,11 +47,7 @@ def read_list(ticker):
       twohundreddayaveragechange, twohundreddayaveragechangepercent, pricedate FROM qoutes WHERE symbol = %s ORDER BY pricedate;""",
                     (ticker.upper(),))
         result = cur.fetchall()
-        print(json.dumps(result, indent=2))
 
-        #for row in result:
-           # resultDict.append({'ask': ticker, 'pricedate': row[0], 'volume': row[1], 'close': row[2],
-                              # 'timestamp': get_timestamp()})
     # otherwise, nope, not found
     except ValueError:
         abort(
@@ -60,3 +56,16 @@ def read_list(ticker):
     cur.close()
     conn.close()
     return flask.jsonify(result)
+
+
+def getMovers(direction):
+    cur, conn = connect_to_db()
+    if direction =='up':
+        cur.execute("""SELECT * FROM qoutes WHERE regularmarketchangepercent!=0 AND marketcap > 10
+                      ORDER BY pricedate DESC, regularmarketchangepercent DESC LIMIT 3; """)
+    elif direction =='down':
+        cur.execute("""SELECT * FROM qoutes WHERE regularmarketchangepercent!=0 AND marketcap > 10
+                            ORDER BY pricedate DESC, regularmarketchangepercent ASC LIMIT 3; """)
+    return flask.jsonify(cur.fetchall())
+
+
