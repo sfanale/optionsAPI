@@ -1,7 +1,6 @@
 from datetime import datetime
 import psycopg2
 import json
-import flask
 from psycopg2.extras import RealDictCursor
 
 
@@ -29,22 +28,9 @@ def read_list(ticker):
     """
     # Does the person exist in people?
     cur, conn = connect_to_db()
-    resultDict = []
+    result = []
     try:
-        cur.execute("""SELECT ask, asksize, averagedailyvolume10day, averagedailyvolume3month, bid,
-      bidsize, bookvalue, currency, dividenddate, earningstimestamp, earningstimestampend, 
-      earningstimestampstart, epsforward, epstrailing12months, esgpopulated, exchange, exchangedatadelayedby,
-      exchangetimezonename, exchangetimezoneshortname, fiftydayaverage, fiftydayaveragechange, 
-      fiftydayaveragechangepercent, fiftytwoweekhigh, fiftytwoweekhighchange, fiftytwoweekhighchangepercent,
-      fiftytwoweeklow, fiftytwoweeklowchange, fiftytwoweeklowchangepercent, fiftytwoweekrange, 
-      financialcurrency, forwardpe, fullexchangename, gmtoffsetmilliseconds, language, longname, 
-      market, marketcap, marketstate, messageboardid, postmarketchange, postmarketchangepercent, 
-      postmarketprice, postmarkettime, pricehint, pricetobook, quotesourcename, quotetype, region,
-      regularmarketchange, regularmarketchangepercent, regularmarketdayhigh, regularmarketdaylow, 
-      regularmarketdayrange, regularmarketopen, regularmarketpreviousclose, regularmarketprice, 
-      regularmarkettime, regularmarketvolume, sharesoutstanding, shortname, sourceinterval, symbol, 
-      tradeable, trailingannualdividendrate, trailingannualdividendyield, trailingpe, twohundreddayaverage, 
-      twohundreddayaveragechange, twohundreddayaveragechangepercent, pricedate FROM qoutes WHERE symbol = %s ORDER BY pricedate;""",
+        cur.execute("""SELECT * FROM qoutes WHERE symbol = %s ORDER BY pricedate;""",
                     (ticker.upper(),))
         result = cur.fetchall()
 
@@ -55,17 +41,38 @@ def read_list(ticker):
         )
     cur.close()
     conn.close()
-    return flask.jsonify(result)
+    return result
 
 
 def getMovers(direction):
     cur, conn = connect_to_db()
     if direction =='up':
         cur.execute("""SELECT * FROM qoutes WHERE regularmarketchangepercent!=0 AND marketcap > 10
-                      ORDER BY pricedate DESC, regularmarketchangepercent DESC LIMIT 3; """)
+                      ORDER BY pricedate DESC, regularmarketchangepercent DESC LIMIT 10; """)
     elif direction =='down':
         cur.execute("""SELECT * FROM qoutes WHERE regularmarketchangepercent!=0 AND marketcap > 10
-                            ORDER BY pricedate DESC, regularmarketchangepercent ASC LIMIT 3; """)
-    return flask.jsonify(cur.fetchall())
+                            ORDER BY pricedate DESC, regularmarketchangepercent ASC LIMIT 10; """)
+    else:
+        return direction
+    return cur.fetchall()
 
 
+def lambda_handler(event, context):
+    op = event["queryStringParameters"]['operation']
+    query = event["queryStringParameters"]['operand1']
+    result = []
+    if op == "read_list":
+        result = read_list(query)
+    elif op == "movers":
+        result = getMovers(query)
+
+    else:
+        return {
+            'statusCode': 500,
+            'body': json.dumps(op)
+        }
+    return {
+        'statusCode': 200,
+        'body': json.dumps(result),
+        'headers': {"Access-Control-Allow-Origin": "*"}
+    }
