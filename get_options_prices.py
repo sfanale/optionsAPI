@@ -5,8 +5,7 @@ import flask
 import json
 # 3rd party modules
 from flask import make_response, abort
-
-
+import time
 
 
 def connect_to_db():
@@ -29,25 +28,29 @@ def read_list(ticker):
     """
     # Does the person exist in people?
     cur, conn = connect_to_db()
-    resultDict = []
     values = ticker.split(':')
     try:
+        cur.execute("""SELECT DISTINCT pricedate FROM QOUTES ORDER BY pricedate DESC""")
+        last_date = str(int(cur.fetchall()[0]['pricedate']))
+        print(last_date)
         if values[1] == '' and values[2] == '':
             cur.execute(
-                """SELECT DISTINCT contractsymbol, expiration, strike, optiontype, lastprice FROM prices WHERE underlyingsymbol = %s ORDER BY expiration;""",
-                (values[0].upper(),))
+                """SELECT DISTINCT contractsymbol, expiration, strike, optiontype, lastprice FROM prices WHERE 
+                underlyingsymbol = %s and pricedate = %s ORDER BY expiration;""",(values[0].upper(), last_date))
         elif values[1] == '':
             cur.execute(
-                """SELECT DISTINCT contractsymbol, expiration, strike, optiontype, lastprice FROM prices WHERE underlyingsymbol = %s  AND expiration > %s ORDER BY expiration;""",
-                (values[0].upper(), values[2]))
+                """SELECT DISTINCT contractsymbol, expiration, strike, optiontype, lastprice FROM prices WHERE 
+              underlyingsymbol = %s  AND expiration > %s AND pricedate = %s ORDER BY expiration;""", (values[0].upper(), values[2], last_date))
         elif values [2] == '':
             cur.execute(
-                """SELECT DISTINCT contractsymbol, expiration, strike, optiontype, lastprice FROM prices WHERE underlyingsymbol = %s AND strike = %s ORDER BY expiration;""",
-                (values[0].upper(), values[1],))
+                """SELECT DISTINCT contractsymbol, expiration, strike, optiontype, lastprice FROM prices WHERE
+                underlyingsymbol = %s AND strike = %s AND pricedate= %s ORDER BY expiration;""",
+                (values[0].upper(), values[1], last_date))
         else:
             cur.execute(
-                """SELECT DISTINCT contractsymbol, expiration, strike, optiontype, lastprice FROM prices WHERE underlyingsymbol = %s AND strike = %s AND expiration> %s ORDER BY expiration;""",
-                (values[0].upper(), values[1], values[2]))
+                """SELECT DISTINCT contractsymbol, expiration, strike, optiontype, lastprice FROM prices WHERE
+                underlyingsymbol = %s AND strike = %s AND expiration> %s AND pricedate = %s ORDER BY expiration;""",
+                (values[0].upper(), values[1], values[2], last_date))
 
         result = cur.fetchall()
 
@@ -89,7 +92,7 @@ def read_one_all(ticker):
     return result
 
 
-def read_one_symbol(contractsymbol):
+def read_one_symbol(contractsymbol, pricetype):
     """
         This function responds to a request for /api/options/detail/{contractsymbol}
         with  matching assset from options database
@@ -100,8 +103,8 @@ def read_one_symbol(contractsymbol):
     cur, conn = connect_to_db()
     result = []
     try:
-        cur.execute("""SELECT * FROM prices WHERE contractsymbol = %s ORDER BY pricedate;""",
-                    (contractsymbol.upper(),))
+        cur.execute("""SELECT * FROM prices WHERE contractsymbol = %s and pricetype= %s ORDER BY pricedate;""",
+                    (contractsymbol.upper(), pricetype))
         result = cur.fetchall()
 
     except ValueError:
@@ -171,20 +174,69 @@ SELECT contractsymbol FROM t WHERE contractsymbol IS NOT NULL;""")
     return result
 
 
+def getByIndustry(industry):
+    """
+
+    :param industry:
+    :return:
+    """
+    cur, conn = connect_to_db()
+    result = []
+    try:
+        cur.execute("""SELECT * FROM prices WHERE industry = %s;""", (industry,))
+        result = cur.fetchall()
+
+    # otherwise, nope, not found
+    except ValueError:
+        abort(
+            404, "not found"
+        )
+    cur.close()
+    conn.close()
+    return result
+
+
+def getBySector(sector):
+    """
+
+    :param industry:
+    :return:
+    """
+    cur, conn = connect_to_db()
+    result = []
+    try:
+        cur.execute("""SELECT * FROM prices WHERE sector = %s;""", (sector,))
+        result = cur.fetchall()
+
+    # otherwise, nope, not found
+    except ValueError:
+        abort(
+            404, "not found"
+        )
+    cur.close()
+    conn.close()
+    return result
+
+
 def lambda_handler(event, context):
     op = event["queryStringParameters"]['operation']
     ticker = event["queryStringParameters"]['operand1']
+    info = event["queryStringParameters"]['operand2']
     result = []
     if op == "read_list":
         result = read_list(ticker)
-    elif op == "read_one_all":
+    elif op == "get_all_by_ticker":
         result = read_one_all(ticker)
-    elif op == "read_one_symbol":
-        result =read_one_symbol(ticker)
+    elif op == "get_one_contract":
+        result = read_one_symbol(ticker, info)
     elif op == "get_all_tickers":
         result = getAllTickers()
     elif op == "get_all_contracts":
         result = getAllContracts()
+    elif op == "get_by_industry":
+        result = getByIndustry(ticker)
+    elif op == "get_by_sector":
+        result = getBySector(ticker)
     else:
         return {
             'statusCode': 500,

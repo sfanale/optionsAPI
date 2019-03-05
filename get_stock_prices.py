@@ -46,15 +46,33 @@ def read_list(ticker):
 
 def getMovers(direction):
     cur, conn = connect_to_db()
+    cur.execute("""SELECT DISTINCT pricedate FROM QOUTES ORDER BY pricedate DESC""")
+    last_date = str(int(cur.fetchall()[0]['pricedate']))
     if direction =='up':
-        cur.execute("""SELECT * FROM qoutes WHERE regularmarketchangepercent!=0 AND marketcap > 10
-                      ORDER BY pricedate DESC, regularmarketchangepercent DESC LIMIT 10; """)
+        cur.execute("""SELECT * FROM qoutes WHERE regularmarketchangepercent!=0 AND marketcap > 10 AND pricedate= %s 
+        ORDER BY regularmarketchangepercent DESC LIMIT 10;""", (last_date,))
     elif direction =='down':
-        cur.execute("""SELECT * FROM qoutes WHERE regularmarketchangepercent!=0 AND marketcap > 10
-                            ORDER BY pricedate DESC, regularmarketchangepercent ASC LIMIT 10; """)
+        cur.execute("""SELECT * FROM qoutes WHERE regularmarketchangepercent!=0 AND marketcap > 10 AND pricedate = %s
+                      ORDER BY regularmarketchangepercent ASC LIMIT 10; """, (last_date,))
     else:
         return direction
     return cur.fetchall()
+
+
+def getIndustries():
+    cur, conn = connect_to_db()
+    cur.execute("""SELECT DISTINCT industry FROM assetinfo """)
+    info = cur.fetchall()
+    result = [i['industry'] for i in info]
+    return result
+
+
+def getSector():
+    cur, conn = connect_to_db()
+    cur.execute("""SELECT DISTINCT sector FROM assetinfo """)
+    info = cur.fetchall()
+    result = [i['sector'] for i in info]
+    return result
 
 
 def lambda_handler(event, context):
@@ -65,6 +83,10 @@ def lambda_handler(event, context):
         result = read_list(query)
     elif op == "movers":
         result = getMovers(query)
+    elif op == "industries":
+        result = getIndustries()
+    elif op == 'sectors':
+        result = getSector()
 
     else:
         return {
